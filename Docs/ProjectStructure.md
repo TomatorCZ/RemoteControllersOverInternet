@@ -8,17 +8,23 @@ The solution contains:
 - **Components** - Library provides razor components which are used by **Client** (Buttons etc..).
 - **Server** - Starts a Http server which routes to **Client** and provides a communication between user's browser and **Server**. 
 - **Shared** - Other classes are used **Client**, **Components** and **Server**.
+- **Demo** - Shows you how to use the library
 
-![SolutionStructure](SolutionStructure.png)
+<img src="SolutionStructure.png" alt="SolutionStructure" style="zoom:80%;" />
 
 #### Frameworks
 
-| Project    | Target Framework |
-| ---------- | ---------------- |
-| Client     | netstandard2.1   |
-| Components | netstandard2.0   |
-| Server     | netcoreapp3.1    |
-| Shared     | netcoreapp3.1    |
+| Project    | Target Framework | Application type              |
+| ---------- | ---------------- | ----------------------------- |
+| Client     | netstandard2.1   | Blazor WebAssembly            |
+| Components | netstandard2.0   | Razor Component Library       |
+| Server     | netcoreapp3.1    | .Net Core Library             |
+| Shared     | netcoreapp3.1    | .Net Core Library             |
+| Demo       | netcoreapp3.1    | .Net Core Console Application |
+
+#### Important files
+
+- {ApplicationName}.StaticWebAssets.xml - Is located in bin and takes care about mapping URL to static files (index.html etc.) 
 
 #### Client
 

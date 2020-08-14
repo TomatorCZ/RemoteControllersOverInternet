@@ -23,11 +23,8 @@ Second component is a proper server. When the user starts to manipulate with the
 
 ### Status
 
+#### 14/08/2020
+
+Project can be launch from Demo console application refers to your project. See Docs for more information.
+
 There are no releases yet. If you are interest in it take a look at Docs or feel free to contact me (husaktomas98@gmail.com).
-
-### 
-
-### 
-
-### 
-
