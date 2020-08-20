@@ -1,13 +1,30 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using RemoteControllers;
+using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace RemoteController
 {
-    public class Server
+    public class Server : IDisposable
     {
         IHost _host;
+        public ClientManager Manager 
+        {
+            get {
+                if (_host == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    var result = _host.Services.GetService(typeof(ClientManager));
+                    return result as ClientManager;
+                }   
+            } 
+        }
 
         public Server()
         {
@@ -23,9 +40,21 @@ namespace RemoteController
             });
         }
 
-        public async Task Run()
+        public async Task RunAsync()
         {
             await _host.RunAsync();
+        }
+
+        public async Task CloseAsync()
+        {
+            await Manager.CloseAsync();
+            await _host.StopAsync();
+        }
+
+        public void Dispose()
+        {
+            Manager.Dispose();
+            _host.StopAsync().Wait();
         }
     }
 }

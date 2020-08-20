@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
+using Microsoft.Extensions.Configuration;
 using RemoteController;
+using RemoteControllers;
 
 namespace Demo
 {
@@ -17,7 +22,10 @@ namespace Demo
         {
             // Launch Client
             Server server = new Server();
-            await server.Run();
+
+            new Task(async () => await server.RunAsync()).Start();
+
+            await server.Manager.RecieveEventAsync();
         }
     }
 }
