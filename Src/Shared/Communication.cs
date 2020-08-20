@@ -5,17 +5,13 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace Shared
+namespace RemoteControllers
 {
-    /// <summary>
-    /// Represents state of connection.
-    /// </summary>
     public enum MessageType 
-    { 
-        Configuration = 1, 
-        Controllers = 2,
+    {
+        ConfigurationMessage = 1, 
         ChangeStateMessage = 3,
-        Default = 4
+        InitialMessage = 4
     };
 
     interface IEncoder
@@ -28,11 +24,11 @@ namespace Shared
     /// </summary>
     public class ChangeStateMessage : IEncoder
     {
-        public MessageType Type { get;}
+        public MessageManagerState State { get;}
 
-        public ChangeStateMessage(MessageType type = MessageType.Default)
+        public ChangeStateMessage(MessageManagerState state = MessageManagerState.Initial)
         {
-            Type = type; 
+            State = state; 
         }
 
         #region Encoding/Decoding
@@ -46,7 +42,7 @@ namespace Shared
             byte opCode = (byte)MessageType.ChangeStateMessage;
 
             // Body
-            byte newState = (byte)Type;
+            byte newState = (byte)State;
 
             return new byte[] { opCode, newState };
         }
@@ -64,11 +60,14 @@ namespace Shared
 
             switch (data[1])
             {
-                case 1:
-                    msg = new ChangeStateMessage(MessageType.Configuration);
+                case (byte)MessageManagerState.Initial:
+                    msg = new ChangeStateMessage(MessageManagerState.Initial);
                     return true;
-                case 2:
-                    msg = new ChangeStateMessage(MessageType.Controllers);
+                case (byte)MessageManagerState.Configuration:
+                    msg = new ChangeStateMessage(MessageManagerState.Configuration);
+                    return true;
+                case (byte)MessageManagerState.Controllers:
+                    msg = new ChangeStateMessage(MessageManagerState.Controllers);
                     return true;
                 default:
                     msg = new ChangeStateMessage();
@@ -79,6 +78,21 @@ namespace Shared
         #endregion
     }
 
+    public class InitialMessage : IEncoder
+    {
+        public byte[] Encode(Encoding encoding)
+        {
+            return new byte[] { (byte)MessageType.InitialMessage };
+        }
+
+        public static bool TryDecode(byte[] data, Encoding encoding, out InitialMessage msg)
+        {
+            msg = new InitialMessage();
+
+            return data != null && data.Length == 1 && data[0] == (byte)MessageType.InitialMessage;
+        }
+    }
+
     /// <summary>
     /// Provides information about user configuration of controllers.
     /// </summary>
@@ -87,7 +101,7 @@ namespace Shared
         /// <summary>
         /// Contains binding IDs to controllers
         /// </summary>
-        Dictionary<byte, Type> Args;
+        public Dictionary<byte, Type> Args { get; }
 
         public ConfigurationMessage()
         {
@@ -99,7 +113,7 @@ namespace Shared
         /// </summary>
         public void AddBinding(byte ID, ControllerEvent args) => AddBinding(ID, args.GetType());
 
-        private void AddBinding(byte ID, Type args)
+        public void AddBinding(byte ID, Type args)
         {
             if (Args.ContainsKey(ID))
             {
@@ -130,7 +144,7 @@ namespace Shared
             MemoryStream builder = new MemoryStream();
 
             // Header
-            builder.WriteByte((byte)MessageType.Configuration); // OpCode
+            builder.WriteByte((byte)MessageType.ConfigurationMessage); // OpCode
             builder.WriteByte(0); // Separator
             builder.WriteByte((byte)Args.Count); // Count of controllers
             builder.WriteByte(0); // Separator
@@ -149,7 +163,7 @@ namespace Shared
         /// <summary>
         /// Decodes s message and finds Type instances by their name in the data.
         /// </summary>
-        public static bool Decode(byte[] data, Encoding encoding, out ConfigurationMessage msg)
+        public static bool TryDecode(byte[] data, Encoding encoding, out ConfigurationMessage msg)
         {
             msg = new ConfigurationMessage();
 
@@ -157,13 +171,15 @@ namespace Shared
                 return false;
 
             int countOfControllers = data[2];
-            byte[][] records = data.Split(0, 2 + countOfControllers);
+            int skip = countOfControllers == 0 ? 1 : 2;
+            byte[][] records = data.Split(0, skip + countOfControllers);
+
             
             // Go through all records and find their types. 
-            foreach (var item in records)
+            for (int i = skip; i < skip + countOfControllers; i++)
             {
-                byte id = item[0];
-                string nameOfClass = encoding.GetString(item, 1, item.Length - 1);
+                byte id = records[i][0];
+                string nameOfClass = encoding.GetString(records[i], 1, records[i].Length - 1);
 
                 try
                 {
@@ -174,11 +190,11 @@ namespace Shared
                     else
                         return false;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return false;
-                }           
-            }
+                }
+            }    
 
             return true;
         }
