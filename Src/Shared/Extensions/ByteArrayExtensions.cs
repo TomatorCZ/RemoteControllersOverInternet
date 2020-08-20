@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Shared
+namespace RemoteControllers
 {
     public static class ByteArrayExtensions
     {
@@ -27,7 +27,7 @@ namespace Shared
                     else
                     {
                         int length = i - lastIndex;
-                        result[indexOfResult++] = array.SubArray(i, length);
+                        result[indexOfResult++] = array.SubArray(lastIndex, length);
                         
                         lastIndex = i + 1;
                     }
@@ -48,9 +48,9 @@ namespace Shared
                 throw new ArgumentException("Can not be negative", nameof(index));
 
             var result = new byte[length];
-            for (int i = index; i < array.Length && i < i + length; i++)
+            for (int i = 0; i < array.Length && i < length; i++)
             {
-                result[index - i] = array[i];
+                result[i] = array[index + i];
             }
 
             return result;

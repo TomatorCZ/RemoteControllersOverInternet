@@ -4,7 +4,7 @@ using System.Data;
 using System.IO;
 using System.Text;
 
-namespace Shared
+namespace RemoteControllers
 {
     public static class MemoryStreamExtensions
     {
