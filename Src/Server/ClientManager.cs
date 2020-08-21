@@ -21,6 +21,7 @@ namespace RemoteController
         private Dictionary<Guid, Player> _players;
         private List<Task<InfoControllerEvent>> _events;
         private object _playersLock = new object();
+        private CancellationTokenSource _src = new CancellationTokenSource();
 
         public bool IsDisposed { get; private set; } = false;
         public bool RemoveClientsAfterDisconnect { get; } = true;
@@ -47,6 +48,7 @@ namespace RemoteController
             {
                 _players.Add(newClient.Guid, newClient);
                 _events.Add(newClient.ReceiveAsync());
+                _src.Cancel();
             }
             
             return newClient;
@@ -92,7 +94,17 @@ namespace RemoteController
                 while (_events.Count == 0)
                     await Task.Delay(25);
 
-                int index = Task.WaitAny(_events.ToArray());
+                int index = -1;
+                try
+                {
+                     index = Task.WaitAny(_events.ToArray(), _src.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    _src = new CancellationTokenSource();
+                    continue;
+                }
+                
                 result = await _events[index];
 
                 if (GetClient(result.Sender).IsConnected)
@@ -141,6 +153,7 @@ namespace RemoteController
         {
             foreach (var client in _players)
                 client.Value.Dispose();
+            _src.Dispose();
 
             IsDisposed = true;
         }
