@@ -10,13 +10,13 @@ namespace RemoteController
     /// </summary>
     public struct InfoControllerEvent
     {
-        public InfoControllerEvent(Player sender, ControllerEvent @event)
+        public InfoControllerEvent(Guid sender, ControllerEvent @event)
         {
             Sender = sender;
             Event = @event;
         }
 
-        public Player Sender { get; }
+        public Guid Sender { get; }
         public ControllerEvent Event { get; }
     }
 }

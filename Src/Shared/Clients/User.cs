@@ -31,5 +31,7 @@ namespace RemoteController
             else
                 throw new NotImplementedException();
         }
+
+        public async Task<ControllerEvent> ReceiveAsync() => await _messageManager.ReceiveAsync(_websocket);
     }
 }

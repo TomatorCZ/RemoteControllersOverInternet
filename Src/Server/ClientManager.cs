@@ -3,6 +3,7 @@ using RemoteController;
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using System.Numerics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Text;
@@ -16,14 +17,19 @@ namespace RemoteController
     /// </summary>
     public class ClientManager : IDisposable
     {
-        private List<Player> _clients;
-        private List<Task<ControllerEvent>> _events;
+        private Dictionary<Guid, Player> _players;
+        private List<Task<InfoControllerEvent>> _events;
+        private object _playersLock = new object();
 
+        public bool IsDisposed { get; private set; } = false;
+        public bool RemoveClientsAfterDisconnect { get; } = true;
+
+        public event Action<Player> OnClientDisconnect;
 
         public ClientManager()
         {
-            _clients = new List<Player>();
-            _events = new List<Task<ControllerEvent>>();
+            _players = new Dictionary<Guid, Player>();
+            _events = new List<Task<InfoControllerEvent>>();
         }
 
         #region Add/Remove/Get/Count
@@ -35,69 +41,94 @@ namespace RemoteController
         public Player AddClient(WebSocket socket)
         {
             var newClient = new Player(socket);
-            _clients.Add(newClient);
-            _events.Add(newClient.ReceiveAsync());
-
+            
+            lock (_playersLock)
+            {
+                _players.Add(newClient.Guid, newClient);
+                _events.Add(newClient.ReceiveAsync());
+            }
+            
             return newClient;
         }
 
         /// <summary>
         /// Disconnects client.
         /// </summary>
-        public async Task RemoveClient(int index)
+        public async Task RemoveClient(Guid id)
         {
-            if (_clients.Count < index && index >= 0)
+            if (_players.ContainsKey(id))
             {
-                await _clients[index].CloseAsync();
+                await _players[id].CloseAsync();
 
-                _clients.RemoveAt(index);
+                lock (_playersLock)
+                    _players.Remove(id);
             }
         }
 
         /// <summary>
         /// Gets a client with the index or null, if index is invalid.
         /// </summary>
-        public Player GetClient(int index)
+        public Player GetClient(Guid id)
         {
-            if (_clients.Count < index && index >= 0)
-                return _clients[index];
-            else
-                return null;
+            lock (_playersLock)
+                return _players.ContainsKey(id) ? _players[id] : null;
         }
 
-        public int ClientsCount() => _clients.Count;
+        public int ClientsCount()
+        { 
+            lock(_playersLock)
+                return _players.Count;
+        }
         #endregion
 
         public async Task<InfoControllerEvent> RecieveEventAsync()
         {
-            //Wait for first user.
-            while (_clients.Count == 0)
-                await Task.Delay(25);
+            InfoControllerEvent result = default;
 
-            var result = await Wait();
+            while (true)
+            {
+                // Waits for first user.
+                while (_events.Count == 0)
+                    await Task.Delay(25);
+
+                int index = Task.WaitAny(_events.ToArray());
+                result = await _events[index];
+
+                if (GetClient(result.Sender).IsConnected)
+                {
+                    _events[index] = GetClient(result.Sender).ReceiveAsync();
+                    break;
+                }
+                else
+                {
+                    lock (_playersLock)
+                        _events.RemoveAt(index);
+
+                    OnClientDisconnect?.Invoke(GetClient(result.Sender));
+
+                    if (RemoveClientsAfterDisconnect)
+                        await RemoveClient(result.Sender);
+                }
+            }
 
             return result;
         }
 
-        private async Task<InfoControllerEvent> Wait()
-        {
-            int index = Task.WaitAny(_events.ToArray());
-
-            var result = await _events[index];
-            _events[index] = _clients[index].ReceiveAsync();
-            return new InfoControllerEvent(_clients[index], result);
-        }
-
         public async Task CloseAsync()
         {
-            foreach (var client in _clients)
-                await client.CloseAsync();
+            foreach (var client in _players)
+                await client.Value.CloseAsync();
+            
+            lock(_playersLock)
+                _players = new Dictionary<Guid, Player>();
         }
 
         public void Dispose()
         {
-            foreach (var client in _clients)
-                client.Dispose();
+            foreach (var client in _players)
+                client.Value.Dispose();
+
+            IsDisposed = true;
         }
     }
 }

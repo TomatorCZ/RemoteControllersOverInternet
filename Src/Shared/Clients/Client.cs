@@ -40,7 +40,7 @@ namespace RemoteController
                 await _messageManager.SendConfigurationAsync(_websocket, msg);
         }
 
-        public async Task<ControllerEvent> ReceiveAsync() => await _messageManager.ReceiveAsync(_websocket);
+        
         #endregion
 
         public async Task CloseAsync()
