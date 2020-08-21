@@ -30,6 +30,9 @@ namespace RemoteController
         byte[] _buffer;
         bool IsEventChannel = false;
 
+        public bool IsDisposed { get; private set; } = false;
+        public event Action OnCloseMessage;
+
         public MessageManager(Encoding encoding)
         {
             _encoding = encoding;
@@ -78,6 +81,9 @@ namespace RemoteController
 
                 } while (!result.EndOfMessage);
 
+                if (result.MessageType == WebSocketMessageType.Close)
+                    return null;
+
                 return memory.ToArray();
             }
         }
@@ -87,7 +93,7 @@ namespace RemoteController
             byte[] message = await ReceiveRawDataAsync(socket);
 
             // Handles messages until controllers message mode starts.
-            while (_state != MessageManagerState.Controllers)
+            while (_state != MessageManagerState.Controllers && message != null)
             {
                 if (!HandleChangeState(message))
                 {
@@ -105,6 +111,12 @@ namespace RemoteController
                 }
 
                 message = await ReceiveRawDataAsync(socket);
+            }
+
+            if (message == null)
+            {
+                OnCloseMessage?.Invoke();
+                return null;
             }
 
             return HandleControllerEvent(message);
@@ -167,6 +179,7 @@ namespace RemoteController
         {
             _src?.Cancel();
             _src?.Dispose();
+            IsDisposed = true;
         }
         #endregion
 

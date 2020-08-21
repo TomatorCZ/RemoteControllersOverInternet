@@ -19,8 +19,9 @@ The solution contains:
 | Client     | netstandard2.1   | Blazor WebAssembly            |
 | Components | netstandard2.0   | Razor Component Library       |
 | Server     | netcoreapp3.1    | .Net Core Library             |
-| Shared     | netcoreapp3.1    | .Net Core Library             |
+| Shared     | netstandard2.0   | .Net Core Library             |
 | Demo       | netcoreapp3.1    | .Net Core Console Application |
+| UnitTests  | netcoreapp3.1    | MSUnitTests                   |
 
 #### Important files
 
@@ -41,3 +42,7 @@ The solution contains:
 #### Shared
 
 // TODO
+
+#### Demo
+
+#### UnitTests

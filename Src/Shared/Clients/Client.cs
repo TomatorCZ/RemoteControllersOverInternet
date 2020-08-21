@@ -49,7 +49,9 @@ namespace RemoteController
                 _src = new CancellationTokenSource();
             else
                 _src?.Cancel();
-            await _websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, _src.Token);
+
+            if (_websocket.State == WebSocketState.Open)
+                await _websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, _src.Token);
             _messageManager.Dispose();
         }
 
