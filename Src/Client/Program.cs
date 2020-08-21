@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Text;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using RemoteControllers;
+using RemoteController;
 
 namespace Client
 {

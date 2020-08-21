@@ -6,14 +6,15 @@ Place controllers here
     <textarea>Connected</textarea>
 }
 
-<ButtonController ID="1" OnEventCallback="@ButtonEvent" Title="Btn" />
+<ButtonController ID="1" OnEventCallback="@ButtonEventAsync" Title="Btn" />
 
 
 
 @code {
-    private void ButtonEvent(ButtonControllerEvent e)
+    private async Task ButtonEventAsync(ButtonControllerEvent e)
     {
-        // TODO: Send info
+        Console.WriteLine("Click");
+        await _client.SendAsync(e);
     }
 
     protected override async Task OnInitializedAsync()
@@ -28,9 +29,12 @@ Place controllers here
         }
 
         await _client.SendAsync(new InitialMessage());
+
         ConfigurationMessage msg = new ConfigurationMessage();
         msg.AddBinding(1, typeof(ButtonControllerEvent));
+
         await _client.SendAsync(msg);
+
         Console.WriteLine("Done");
     }
 }

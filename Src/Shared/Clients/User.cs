@@ -1,4 +1,4 @@
-﻿using RemoteControllers;
+﻿using RemoteController;
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RemoteControllers
+namespace RemoteController
 {
     /// <summary>
     /// Represents Client in a browser.

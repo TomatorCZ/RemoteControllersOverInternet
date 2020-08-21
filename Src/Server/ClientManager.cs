@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using RemoteControllers;
+using RemoteController;
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
@@ -16,51 +16,87 @@ namespace RemoteController
     /// </summary>
     public class ClientManager : IDisposable
     {
-        public List<Player> Clients { get; }
-        public List<Task<ControllerEvent>> _events;
+        private List<Player> _clients;
+        private List<Task<ControllerEvent>> _events;
+
 
         public ClientManager()
         {
-            Clients = new List<Player>();
+            _clients = new List<Player>();
             _events = new List<Task<ControllerEvent>>();
         }
 
-        public Client AddClient(WebSocket socket)
+        #region Add/Remove/Get/Count
+        /// <summary>
+        /// Adds a new client and starts to recieve his messages.
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <returns></returns>
+        public Player AddClient(WebSocket socket)
         {
             var newClient = new Player(socket);
-            Clients.Add(newClient);
+            _clients.Add(newClient);
             _events.Add(newClient.ReceiveAsync());
+
             return newClient;
         }
 
+        /// <summary>
+        /// Disconnects client.
+        /// </summary>
+        public async Task RemoveClient(int index)
+        {
+            if (_clients.Count < index && index >= 0)
+            {
+                await _clients[index].CloseAsync();
+
+                _clients.RemoveAt(index);
+            }
+        }
+
+        /// <summary>
+        /// Gets a client with the index or null, if index is invalid.
+        /// </summary>
+        public Player GetClient(int index)
+        {
+            if (_clients.Count < index && index >= 0)
+                return _clients[index];
+            else
+                return null;
+        }
+
+        public int ClientsCount() => _clients.Count;
+        #endregion
+
         public async Task<InfoControllerEvent> RecieveEventAsync()
         {
-            while (Clients.Count == 0)
-            {
+            //Wait for first user.
+            while (_clients.Count == 0)
                 await Task.Delay(25);
-            }
 
-            var result = await new Task<InfoControllerEvent>(() =>
-            {
-                int index = Task.WaitAny(_events.ToArray());
-
-                var result = _events[index];
-                _events[index] = Clients[index].ReceiveAsync();
-                return new InfoControllerEvent(Clients[index], result.Result);
-            });
+            var result = await Wait();
 
             return result;
         }
 
+        private async Task<InfoControllerEvent> Wait()
+        {
+            int index = Task.WaitAny(_events.ToArray());
+
+            var result = await _events[index];
+            _events[index] = _clients[index].ReceiveAsync();
+            return new InfoControllerEvent(_clients[index], result);
+        }
+
         public async Task CloseAsync()
         {
-            foreach (var client in Clients)
+            foreach (var client in _clients)
                 await client.CloseAsync();
         }
 
         public void Dispose()
         {
-            foreach (var client in Clients)
+            foreach (var client in _clients)
                 client.Dispose();
         }
     }

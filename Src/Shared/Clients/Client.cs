@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RemoteControllers
+namespace RemoteController
 {
     public abstract class Client : IDisposable
     {

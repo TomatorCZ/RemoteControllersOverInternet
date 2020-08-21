@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RemoteControllers
+namespace RemoteController
 {
     /// <summary>
     /// Represents a state of connection.
@@ -48,7 +48,6 @@ namespace RemoteControllers
         {
             await socket.SendAsync(new ArraySegment<byte>(new ChangeStateMessage(MessageManagerState.Configuration).Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
             await socket.SendAsync(new ArraySegment<byte>(msg.Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
-            Console.WriteLine(msg.Encode(_encoding).Length);
         }
 
         public async Task SendAsync(WebSocket socket, ControllerEvent eventArgs)
@@ -140,7 +139,10 @@ namespace RemoteControllers
 
         protected ControllerEvent HandleControllerEvent(byte[] data)
         {
-            throw new NotImplementedException();
+            if (data == null || data.Length < 1)
+                return null;
+
+            return _eventManager.GetEvent(data[0], data);
         }
 
         protected void HandleConfiguration(byte[] data)

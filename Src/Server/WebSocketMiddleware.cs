@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace RemoteController
 {
+    /// <summary>
+    /// Handles incomming upgrade requests and accepting new clients.
+    /// </summary>
     public class WebSocketMiddleware
     {
         private readonly RequestDelegate _next;

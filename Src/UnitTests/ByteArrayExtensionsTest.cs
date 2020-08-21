@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RemoteControllers;
+using RemoteController;
 using System.Diagnostics;
 
 namespace UnitTests

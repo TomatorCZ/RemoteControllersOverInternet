@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using RemoteControllers;
+using RemoteController;
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;

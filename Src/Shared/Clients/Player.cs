@@ -1,10 +1,10 @@
-﻿using RemoteControllers;
+﻿using RemoteController;
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 
-namespace RemoteControllers
+namespace RemoteController
 {
     /// <summary>
     /// Represents client on server-side.

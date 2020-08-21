@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.Extensions.Configuration;
 using RemoteController;
-using RemoteControllers;
 
 namespace Demo
 {
@@ -25,7 +25,12 @@ namespace Demo
 
             new Task(async () => await server.RunAsync()).Start();
 
-            await server.Manager.RecieveEventAsync();
+            while (true)
+            {
+                var action = await server.Manager.RecieveEventAsync();
+                Console.WriteLine(action.Event.ToString());
+            }
+
         }
     }
 }

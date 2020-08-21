@@ -5,13 +5,13 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace RemoteControllers
+namespace RemoteController
 {
     public enum MessageType 
     {
         ConfigurationMessage = 1, 
-        ChangeStateMessage = 3,
-        InitialMessage = 4
+        ChangeStateMessage = 2,
+        InitialMessage = 3
     };
 
     interface IEncoder

@@ -12,6 +12,6 @@
 
     protected async Task Click()
     {
-        await OnEventCallback.InvokeAsync(new ButtonControllerEvent());
+        await OnEventCallback.InvokeAsync(new ButtonControllerEvent(ID,ButtonEvent.Click));
     }
 }

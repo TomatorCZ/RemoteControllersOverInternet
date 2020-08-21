@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace RemoteControllers
+namespace RemoteController
 {
     public static class ByteArrayExtensions
     {
