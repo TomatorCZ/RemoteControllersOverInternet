@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
-using RemoteController;
-using System;
-using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using System.Net.WebSockets;
-using System.Security.AccessControl;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RemoteController
@@ -16,11 +12,13 @@ namespace RemoteController
     {
         private readonly RequestDelegate _next;
         private readonly ClientManager _manager;
+        private readonly ILogger<WebSocketMiddleware> _logger;
 
-        public WebSocketMiddleware(RequestDelegate next, ClientManager manager)
+        public WebSocketMiddleware(RequestDelegate next, ClientManager manager, ILogger<WebSocketMiddleware> logger)
         {
             _next = next;
             _manager = manager;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -30,7 +28,7 @@ namespace RemoteController
                 if (httpContext.WebSockets.IsWebSocketRequest)
                 {
                     WebSocket webSocket = await httpContext.WebSockets.AcceptWebSocketAsync();
-
+                    _logger.LogInformation("Web socket accepted.");
                     await Process(webSocket);
                 }
                 else

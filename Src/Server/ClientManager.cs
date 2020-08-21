@@ -1,13 +1,6 @@
-﻿
-using Microsoft.AspNetCore.Http;
-using RemoteController;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
-using System.Numerics;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -50,7 +43,7 @@ namespace RemoteController
                 _events.Add(newClient.ReceiveAsync());
                 _src.Cancel();
             }
-            
+
             return newClient;
         }
 

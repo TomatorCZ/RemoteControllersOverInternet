@@ -1,16 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using RemoteController;
-using System;
-using System.Collections.Generic;
-using System.Net.WebSockets;
-using System.Text;
 
 namespace RemoteController
 {

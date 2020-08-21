@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
-using RemoteController;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RemoteController
@@ -46,7 +44,11 @@ namespace RemoteController
 
         private IHostBuilder CreateHostBuilder(Action<KestrelServerOptions> options)
         {
-            return Host.CreateDefaultBuilder().ConfigureWebHostDefaults(webBuilder =>
+            return Host.CreateDefaultBuilder().ConfigureLogging(opt => 
+            {
+                opt.ClearProviders();
+                opt.AddConsole();
+            }).ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.ConfigureKestrel(options);
                 webBuilder.UseStartup<Startup>();        

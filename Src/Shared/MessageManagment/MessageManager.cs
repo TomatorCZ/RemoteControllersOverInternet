@@ -1,9 +1,6 @@
-﻿using Shared;
+﻿using RemoteController;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Http.Headers;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -155,7 +152,7 @@ namespace RemoteController
             }
             else
             {
-                throw new InvalidDataException();
+                throw new InvalidDataException("Invalid initial message.");
             }
         }
 
@@ -178,6 +175,9 @@ namespace RemoteController
             if (data == null || data.Length < 1)
                 return null;
 
+            if (_eventManager == null)
+                throw new ConfigurationExpectedException();
+
             return _eventManager.GetEvent(data[0], data);
         }
 
@@ -186,11 +186,11 @@ namespace RemoteController
             if (ConfigurationMessage.TryDecode(data, _encoding, out ConfigurationMessage msg))
             {
                 Console.WriteLine("ConfigurationMessage arrived");
-                _eventManager = new ControllersEventManager(msg);
+                _eventManager = new ControllersEventManager(msg, _encoding);
             }
             else
             {
-                throw new InvalidDataException();
+                throw new InvalidDataException("Invalid configuration message.");
             }
         }
 
