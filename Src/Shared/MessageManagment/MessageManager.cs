@@ -42,25 +42,49 @@ namespace RemoteController
         }
 
         #region Send
-        public async Task SendGreetingsAsync(WebSocket socket)
+        public async Task<bool> SendGreetingsAsync(WebSocket socket)
         {
-            await socket.SendAsync(new ArraySegment<byte>(new InitialMessage().Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
-        }
-
-        public async Task SendConfigurationAsync(WebSocket socket, ConfigurationMessage msg)
-        {
-            await socket.SendAsync(new ArraySegment<byte>(new ChangeStateMessage(MessageManagerState.Configuration).Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
-            await socket.SendAsync(new ArraySegment<byte>(msg.Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
-        }
-
-        public async Task SendAsync(WebSocket socket, ControllerEvent eventArgs)
-        {
-            if (!IsEventChannel)
+            try
             {
-                IsEventChannel = true;
-                await socket.SendAsync(new ArraySegment<byte>(new ChangeStateMessage(MessageManagerState.Controllers).Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
+                await socket.SendAsync(new ArraySegment<byte>(new InitialMessage().Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
             }
-            await socket.SendAsync(new ArraySegment<byte>(eventArgs.Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public async Task<bool> SendConfigurationAsync(WebSocket socket, ConfigurationMessage msg)
+        {
+            try
+            {
+                await socket.SendAsync(new ArraySegment<byte>(new ChangeStateMessage(MessageManagerState.Configuration).Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
+                await socket.SendAsync(new ArraySegment<byte>(msg.Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public virtual async Task<bool> SendAsync(WebSocket socket, ControllerEvent eventArgs)
+        {
+            try
+            {
+                if (!IsEventChannel)
+                {
+                    IsEventChannel = true;
+                    await socket.SendAsync(new ArraySegment<byte>(new ChangeStateMessage(MessageManagerState.Controllers).Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
+                }
+                await socket.SendAsync(new ArraySegment<byte>(eventArgs.Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
         #endregion
 
@@ -88,7 +112,7 @@ namespace RemoteController
             }
         }
 
-        public async Task<ControllerEvent> ReceiveAsync(WebSocket socket)
+        public virtual async Task<ControllerEvent> ReceiveAsync(WebSocket socket)
         {
             byte[] message = await ReceiveRawDataAsync(socket);
 
@@ -170,12 +194,12 @@ namespace RemoteController
             }
         }
 
-        public void Close()
+        public virtual void Close()
         {
             _src?.Cancel();
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             _src?.Cancel();
             _src?.Dispose();

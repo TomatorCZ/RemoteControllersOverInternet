@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
+using Microsoft.AspNetCore.Http;
 using RemoteController;
 using System;
 using System.Collections.Generic;
@@ -56,7 +57,7 @@ namespace RemoteController
         /// </summary>
         public async Task RemoveClient(Guid id)
         {
-            if (_players.ContainsKey(id))
+            if (_players.TryGetValue(id, out Player player))
             {
                 await _players[id].CloseAsync();
 
@@ -112,6 +113,19 @@ namespace RemoteController
             }
 
             return result;
+        }
+
+        public async Task<bool> SendAsync(Guid id, ControllerEvent @event)
+        {
+            if (_players.TryGetValue(id, out Player player))
+            {
+                await player.SendAsync(@event);
+                return true;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public async Task CloseAsync()

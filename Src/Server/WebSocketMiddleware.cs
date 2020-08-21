@@ -49,8 +49,7 @@ namespace RemoteController
             var client = _manager.AddClient(socket);
             while (client.IsConnected)
             {
-                //TODO: Do it better with locks and conditional variable.
-                await Task.Delay(25);
+                await Task.Delay(1000);
             }
         }
     }
