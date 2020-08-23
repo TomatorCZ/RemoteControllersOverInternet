@@ -1,0 +1,12 @@
+﻿@page "/play"
+@inject RemoteController.User _user 
+@layout EmptyLayout
+
+@if (isNameChose)
+{
+    <Client.Fragments.Gamepad OnMoveCallback="OnMove"/>
+}
+else
+{
+    <Client.Fragments.Settings OnNameSetCallback="@OnNameChose"/>
+}

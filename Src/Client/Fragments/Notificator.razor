@@ -1,0 +1,11 @@
+﻿@inherits RemoteController.RemoteControllerBase
+
+<table>
+    @foreach (var client in _info)
+    {
+    <tr>
+        <th>@client.Name</th>
+        <th>@client.Button</th>
+    </tr>
+    }
+</table>

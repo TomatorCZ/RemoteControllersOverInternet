@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
+using RemoteController;
 using System.Threading.Tasks;
-using System.Text;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using RemoteController;
 
 namespace Client
 {
@@ -15,10 +12,9 @@ namespace Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
+            // Configuration
             builder.Services.AddBaseAddressHttpClient();
-
-            // Add Client Service
-            builder.Services.AddScoped<User>();
+            builder.Services.AddScopedClient();
 
             await builder.Build().RunAsync();
         }

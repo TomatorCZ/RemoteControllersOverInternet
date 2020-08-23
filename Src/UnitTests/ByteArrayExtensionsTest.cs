@@ -46,6 +46,30 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void Split_3()
+        {
+            //Arrange
+            byte[] sample = new byte[5] { 1, 0, 97, 0, 98};
+            byte[][] expected = new byte[][]
+            {
+                new byte[1] { 1},
+                new byte[1] { 97},
+                new byte[1] { 98 }
+            };
+
+            //Act
+            byte[][] result = sample.Split(0, 3);
+
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expected.Length, result.Length);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                AssertHelper.AreEqual(expected[i], result[i]);
+            }
+        }
+
+        [TestMethod]
         public void SubArray_1()
         {
             //Arrange

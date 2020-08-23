@@ -10,11 +10,11 @@ namespace RemoteController
     /// <summary>
     /// Server provides a http server and <see cref="ClientManager"> for managing clients.
     /// </summary>
-    public class Server : IDisposable
+    public class Server<TStartUp, TClient> : IDisposable where TStartUp : class where TClient : Player
     {
         IHost _host;
 
-        public ClientManager Manager 
+        public ClientManager<TClient> Manager 
         {
             get {
                 if (_host == null)
@@ -23,8 +23,8 @@ namespace RemoteController
                 }
                 else
                 {
-                    var result = _host.Services.GetService(typeof(ClientManager));
-                    return result as ClientManager;
+                    var result = _host.Services.GetService(typeof(ClientManager<TClient>));
+                    return result as ClientManager<TClient>;
                 }   
             } 
         }
@@ -51,7 +51,7 @@ namespace RemoteController
             }).ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.ConfigureKestrel(options);
-                webBuilder.UseStartup<Startup>();        
+                webBuilder.UseStartup<TStartUp>();        
             });
         }
 

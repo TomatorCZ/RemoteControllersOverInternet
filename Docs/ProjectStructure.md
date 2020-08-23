@@ -10,7 +10,7 @@ The solution contains:
 - **Shared** - Other classes are used **Client**, **Components** and **Server**.
 - **Demo** - Shows you how to use the library
 
-<img src="SolutionStructure.png" alt="SolutionStructure" style="zoom:80%;" />
+<img src="SolutionStructure.png" alt="SolutionStructure" style="zoom:110%;" />
 
 #### Frameworks
 
@@ -36,6 +36,16 @@ The solution contains:
 // TODO
 
 #### Server
+
+##### ClientManager
+
+##### Server
+
+##### StartUp
+
+##### WebSocketMiddleware
+
+##### Extensions
 
 // TODO
 

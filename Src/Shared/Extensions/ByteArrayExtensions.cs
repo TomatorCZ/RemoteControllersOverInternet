@@ -33,6 +33,10 @@ namespace RemoteController
                     }
                 }
             }
+            if (lastIndex < array.Length)
+            {
+                result[indexOfResult] = array.SubArray(lastIndex, array.Length - lastIndex);
+            }
 
             return result;
         }

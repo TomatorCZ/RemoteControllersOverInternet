@@ -1,5 +1,4 @@
-﻿using RemoteController;
-using System;
+﻿using System;
 using System.IO;
 using System.Net.WebSockets;
 using System.Text;
@@ -20,12 +19,12 @@ namespace RemoteController
 
     public class MessageManager : IDisposable
     {
-        Encoding _encoding;
-        CancellationTokenSource _src;
-        MessageManagerState _state;
-        ControllersEventManager _eventManager;
-        byte[] _buffer;
-        bool IsEventChannel = false;
+        protected Encoding _encoding;
+        protected CancellationTokenSource _src;
+        protected MessageManagerState _state;
+        protected ControllersEventManager _eventManager;
+        protected ArraySegment<byte> _buffer;
+        protected bool IsEventChannel = false;
 
         public bool IsDisposed { get; private set; } = false;
         public event Action OnCloseMessage;
@@ -35,7 +34,7 @@ namespace RemoteController
             _encoding = encoding;
             _src = new CancellationTokenSource();
             _state = MessageManagerState.Initial;
-            _buffer = new byte[1024];
+            _buffer = WebSocket.CreateServerBuffer(10000);
         }
 
         #region Send
@@ -43,7 +42,8 @@ namespace RemoteController
         {
             try
             {
-                await socket.SendAsync(new ArraySegment<byte>(new InitialMessage().Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
+                await socket.SendAsync(new ArraySegment<byte>(new ChangeStateMessage(MessageManagerState.Initial).Encode(_encoding)), WebSocketMessageType.Binary, true, _src.Token);
+                await socket.SendAsync(new ArraySegment<byte>(new InitialMessage().Encode(_encoding)), WebSocketMessageType.Binary, true, _src.Token);
             }
             catch (Exception)
             {
@@ -56,8 +56,9 @@ namespace RemoteController
         {
             try
             {
-                await socket.SendAsync(new ArraySegment<byte>(new ChangeStateMessage(MessageManagerState.Configuration).Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
-                await socket.SendAsync(new ArraySegment<byte>(msg.Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
+                IsEventChannel = false;
+                await socket.SendAsync(new ArraySegment<byte>(new ChangeStateMessage(MessageManagerState.Configuration).Encode(_encoding)), WebSocketMessageType.Binary, true, _src.Token);                
+                await socket.SendAsync(new ArraySegment<byte>(msg.Encode(_encoding)), WebSocketMessageType.Binary, true, _src.Token);
             }
             catch (Exception)
             {
@@ -66,16 +67,16 @@ namespace RemoteController
             return true;
         }
 
-        public virtual async Task<bool> SendAsync(WebSocket socket, ControllerEvent eventArgs)
+        public async Task<bool> SendAsync(WebSocket socket, ControllerEvent eventArgs)
         {
             try
             {
                 if (!IsEventChannel)
                 {
                     IsEventChannel = true;
-                    await socket.SendAsync(new ArraySegment<byte>(new ChangeStateMessage(MessageManagerState.Controllers).Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
+                    await socket.SendAsync(new ArraySegment<byte>(new ChangeStateMessage(MessageManagerState.Controllers).Encode(_encoding)), WebSocketMessageType.Binary, true, _src.Token);
                 }
-                await socket.SendAsync(new ArraySegment<byte>(eventArgs.Encode(_encoding)), WebSocketMessageType.Text, true, _src.Token);
+                await socket.SendAsync(new ArraySegment<byte>(eventArgs.Encode(_encoding)), WebSocketMessageType.Binary, true, _src.Token);
             }
             catch (Exception)
             {
@@ -88,23 +89,20 @@ namespace RemoteController
         #region Receive
         protected async Task<byte[]> ReceiveRawDataAsync(WebSocket socket)
         {
-            var buffer = WebSocket.CreateServerBuffer(10000);
-
             // Recieve message
             using (var memory = new MemoryStream())
             {
                 WebSocketReceiveResult result = null;
                 do
                 {
-                    result = await socket.ReceiveAsync(buffer, _src.Token);
-
-                    memory.Write(buffer.Array, 0, result.Count);
+                    result = await socket.ReceiveAsync(_buffer, _src.Token);
+                    memory.Write(_buffer.Array, 0, result.Count);
 
                 } while (!result.EndOfMessage);
 
                 if (result.MessageType == WebSocketMessageType.Close)
                     return null;
-
+                
                 return memory.ToArray();
             }
         }
@@ -112,6 +110,7 @@ namespace RemoteController
         public virtual async Task<ControllerEvent> ReceiveAsync(WebSocket socket)
         {
             byte[] message = await ReceiveRawDataAsync(socket);
+            HandleChangeState(message);
 
             // Handles messages until controllers message mode starts.
             while (_state != MessageManagerState.Controllers && message != null)
@@ -147,8 +146,7 @@ namespace RemoteController
         {
             if (InitialMessage.TryDecode(data, _encoding, out InitialMessage msg))
             {
-                Console.WriteLine("InitialMessage arrived");
-                //TODO: Something..
+                return;
             }
             else
             {
@@ -160,7 +158,6 @@ namespace RemoteController
         {
             if (ChangeStateMessage.TryDecode(data,_encoding,out ChangeStateMessage msg))
             {
-                Console.WriteLine("ChangeStateMessage arrived");
                 _state = msg.State;
                 return true;
             }
@@ -185,7 +182,6 @@ namespace RemoteController
         {
             if (ConfigurationMessage.TryDecode(data, _encoding, out ConfigurationMessage msg))
             {
-                Console.WriteLine("ConfigurationMessage arrived");
                 _eventManager = new ControllersEventManager(msg, _encoding);
             }
             else

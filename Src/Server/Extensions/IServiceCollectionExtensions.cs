@@ -4,9 +4,9 @@ namespace RemoteController
 {
     public static class IServiceCollectionExtensions
     {
-        public static IServiceCollection AddClientManager(this IServiceCollection services)
+        public static IServiceCollection AddClientManager<TClient>(this IServiceCollection services, IClientFactory<TClient> factory) where TClient : Player
         {
-            services.AddSingleton<ClientManager>();
+            services.AddSingleton<ClientManager<TClient>>(new ClientManager<TClient>(factory));
             return services;
         }
     }

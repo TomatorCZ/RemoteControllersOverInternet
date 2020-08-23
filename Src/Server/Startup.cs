@@ -18,7 +18,7 @@ namespace RemoteController
         public void ConfigureServices(IServiceCollection services)
         {
             //Add client Manager to handle clients
-            services.AddSingleton<ClientManager>();
+            services.AddClientManager<Player>(new PlayerFactory());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -36,7 +36,7 @@ namespace RemoteController
 
             //Web Socket
             app.UseWebSockets();
-            app.UseWebSocketMiddleware();
+            app.UseWebSocketMiddleware<Player>("/ws");
 
             //app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();

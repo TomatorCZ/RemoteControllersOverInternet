@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading;
@@ -9,22 +10,24 @@ namespace RemoteController
     /// <summary>
     /// Manages all websocket connections with clients.
     /// </summary>
-    public class ClientManager : IDisposable
+    public class ClientManager<TClient> : IDisposable where TClient : Player
     {
-        private Dictionary<Guid, Player> _players;
+        public Dictionary<Guid, TClient> Players { get; private set; }
         private List<Task<InfoControllerEvent>> _events;
         private object _playersLock = new object();
         private CancellationTokenSource _src = new CancellationTokenSource();
+        private IClientFactory<TClient> _clientFactory;
 
         public bool IsDisposed { get; private set; } = false;
         public bool RemoveClientsAfterDisconnect { get; } = true;
 
-        public event Action<Player> OnClientDisconnect;
+        public event Action<TClient> OnClientDisconnect;
 
-        public ClientManager()
+        public ClientManager(IClientFactory<TClient> clientFactory)
         {
-            _players = new Dictionary<Guid, Player>();
+            Players = new Dictionary<Guid, TClient>();
             _events = new List<Task<InfoControllerEvent>>();
+            _clientFactory = clientFactory;
         }
 
         #region Add/Remove/Get/Count
@@ -33,13 +36,13 @@ namespace RemoteController
         /// </summary>
         /// <param name="socket"></param>
         /// <returns></returns>
-        public Player AddClient(WebSocket socket)
+        public TClient AddClient(WebSocket socket)
         {
-            var newClient = new Player(socket);
+            var newClient = _clientFactory.Create(socket);
             
             lock (_playersLock)
             {
-                _players.Add(newClient.Guid, newClient);
+                Players.Add(newClient.Guid, newClient);
                 _events.Add(newClient.ReceiveAsync());
                 _src.Cancel();
             }
@@ -52,28 +55,28 @@ namespace RemoteController
         /// </summary>
         public async Task RemoveClient(Guid id)
         {
-            if (_players.TryGetValue(id, out Player player))
+            if (Players.TryGetValue(id, out TClient player))
             {
-                await _players[id].CloseAsync();
+                await Players[id].CloseAsync();
 
                 lock (_playersLock)
-                    _players.Remove(id);
+                    Players.Remove(id);
             }
         }
 
         /// <summary>
         /// Gets a client with the index or null, if index is invalid.
         /// </summary>
-        public Player GetClient(Guid id)
+        public TClient GetClient(Guid id)
         {
             lock (_playersLock)
-                return _players.ContainsKey(id) ? _players[id] : null;
+                return Players.ContainsKey(id) ? Players[id] : null;
         }
 
         public int ClientsCount()
         { 
             lock(_playersLock)
-                return _players.Count;
+                return Players.Count;
         }
         #endregion
 
@@ -122,7 +125,7 @@ namespace RemoteController
 
         public async Task<bool> SendAsync(Guid id, ControllerEvent @event)
         {
-            if (_players.TryGetValue(id, out Player player))
+            if (Players.TryGetValue(id, out TClient player))
             {
                 await player.SendAsync(@event);
                 return true;
@@ -135,16 +138,16 @@ namespace RemoteController
 
         public async Task CloseAsync()
         {
-            foreach (var client in _players)
+            foreach (var client in Players)
                 await client.Value.CloseAsync();
             
             lock(_playersLock)
-                _players = new Dictionary<Guid, Player>();
+                Players = new Dictionary<Guid, TClient>();
         }
 
         public void Dispose()
         {
-            foreach (var client in _players)
+            foreach (var client in Players)
                 client.Value.Dispose();
             _src.Dispose();
 

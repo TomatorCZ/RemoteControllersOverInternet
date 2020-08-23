@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace RemoteController
@@ -151,7 +152,7 @@ namespace RemoteController
             foreach (KeyValuePair<byte, Type> item in Args)
             {
                 builder.WriteByte(item.Key);
-                builder.WriteBytes(encoding.GetBytes(item.Value.FullName));
+                builder.WriteBytes(encoding.GetBytes(item.Value.AssemblyQualifiedName));
                 builder.WriteByte(0); // Separator
             }
 
@@ -164,7 +165,7 @@ namespace RemoteController
         public static bool TryDecode(byte[] data, Encoding encoding, out ConfigurationMessage msg)
         {
             msg = new ConfigurationMessage();
-
+           
             if (data == null || data.Length < 3)
                 return false;
 

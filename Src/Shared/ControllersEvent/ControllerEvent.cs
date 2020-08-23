@@ -46,10 +46,10 @@ namespace RemoteController
     }
     
     #region Button
-    public enum ButtonEvent { Click }
+    public enum ButtonEvent { Click, MouseDown, MouseUp }
     public class ButtonControllerEvent : ControllerEvent
     {
-        ButtonEvent Event { get; }
+        public ButtonEvent Event { get; }
         
         public ButtonControllerEvent(byte senderID, ButtonEvent @event) : base(senderID)
         {
@@ -78,6 +78,12 @@ namespace RemoteController
                     case (byte)ButtonEvent.Click:
                         controllerEvent = new ButtonControllerEvent(data[0], ButtonEvent.Click);
                         return true;
+                    case (byte)ButtonEvent.MouseDown:
+                        controllerEvent = new ButtonControllerEvent(data[0], ButtonEvent.MouseDown);
+                        return true;
+                    case (byte)ButtonEvent.MouseUp:
+                        controllerEvent = new ButtonControllerEvent(data[0], ButtonEvent.MouseUp);
+                        return true;
                     default:
                         controllerEvent = new ControllerEvent(0);
                         return false;
@@ -86,10 +92,4 @@ namespace RemoteController
         }
     }
     #endregion
-
-    #region TextBox
-    #endregion
-
-    #region Slider
-    #endregion 
 }

@@ -5,9 +5,9 @@ namespace RemoteController
 { 
     public static class IApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseWebSocketMiddleware(this IApplicationBuilder app)
+        public static IApplicationBuilder UseWebSocketMiddleware<TClient>(this IApplicationBuilder app, string requestPath) where TClient : Player
         {  
-            return app.UseMiddleware<WebSocketMiddleware>(app.ApplicationServices.GetRequiredService<ClientManager>());
+            return app.UseMiddleware<WebSocketMiddleware<TClient>>(requestPath);
         }
     }
 }
