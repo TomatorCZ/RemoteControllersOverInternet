@@ -6,7 +6,7 @@ The software provides you a simple and universal way, how to create remote contr
 
 First component behaves like a client. Actually, it is Blazor WebAssembly server which handles an user http request. Let me introduce you an example. An user wants to play a game, but doesn’t have a remote controller. The game, which contains the library, gives him an URL where the Blazor WebAssembly application lives and some authentication. The user fills in the authentication and his web browser is transformed into a controller defined by a creator of game.
 
-Second component is a proper server. When the user starts to manipulate with the controller, the first component produces data which are sent over TCP to the second component. All logic of this feature is hidden and the game takes care about the server which gives it data from the user.
+Second component is a proper server. When the user starts to manipulate with the controller, the first component produces data which are sent over TCP to the second component. All logic of this feature is hidden and the game takes care about the server which gives data from the user.
 
 ### Technologies
 
