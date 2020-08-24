@@ -19,12 +19,10 @@ Second component is a proper server. When the user starts to manipulate with the
 
 ### How to use the library
 
-// TODO
+See Docs/UsersManual.md
 
 ### Status
 
-#### 14/08/2020
-
-Project can be launch from Demo console application refers to your project. See Docs for more information.
+You should be able to run demo and library.  
 
 There are no releases yet. If you are interest in it take a look at Docs or feel free to contact me (husaktomas98@gmail.com).
