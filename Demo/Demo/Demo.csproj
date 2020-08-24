@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="3.2.1" />
+	    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.7" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="Client">
+	    <HintPath>bin\Debug\netcoreapp3.1\Client.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Server">
+	    <HintPath>bin\Debug\netcoreapp3.1\Server.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Shared">
+	    <HintPath>bin\Debug\netcoreapp3.1\Shared.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
+</Project>

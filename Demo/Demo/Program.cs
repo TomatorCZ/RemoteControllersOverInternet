@@ -88,7 +88,7 @@ namespace Demo
 
         public async Task RunAsync()
         {
-            // Launch Client
+            // Launch Server
             Server<MyStartUp, MyPlayer> server = new Server<MyStartUp, MyPlayer>();
             new Task(async () => await server.RunAsync()).Start();
 
