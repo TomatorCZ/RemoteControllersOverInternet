@@ -10,13 +10,13 @@ Project contains 3 libraries : Server.dll, Shared.dll and Components.dll
 
 #### Pipeline
 
-<img src="Images\Pipeline.png" style="zoom:80%;" />
+<img src="Images\Pipeline.png" style="zoom:70%;" />
 
 If you are familiar with ASP.NET Core, you know there is a pipeline which contains middleware handling http requests and forwarding them to others. There is **WebSocketMiddleware** which handles web socket's requests in Server.dll. When the middleware accepts a web socket, the web socket is added to **ClientManager** be ClientManager's method. ClientManager is a microservice and is injected into **ICollectionServices** while **Server**'s configuration. ClientManager creates **Player**, which provides API for sending and receiving messages. I will talk about ClientManager and Server classes later in this article. Then the middleware loops in *Process* method until client is connected. When connection is lost, the middleware returns http response into the pipeline.
 
 #### Client management
 
-<img src="Images\Management.png" style="zoom:80%;" />
+<img src="Images\Management.png" style="zoom:70%;" />
 
 ClientManager takes care about all connected clients. When a new client is added the manager invoke *ReceiveAsync* is a method of Player and the task is stored into _events. When *ReceiveAsync* is called the manager waits until one task is completed in _tasks.*ReceiveAsync* of ClientManager returns only children of **ControllerEvent** with ControllerEvent itself. Each Player has **MessageManager**. MessageManager takes care about encoding and decoding messages. The manager is state machine and has 3 states: Initial, Configuration, Controllers. Initial is starting state of the manager. The manager waits for configuration message in Configuration mode and waits for controller event message in Controllers mode. Message arrives as sequence of byte. MessageManager recognises three types of messages: Initial, ChangeState, Configuration. Initial message isn't interesting. ChangeState message tells MessageManager to switch it's state. When the manager is in Configuration message, the message is treated as **ConfigurationMessage**. Same thing holds for Controllers state and ControllerEvent. the manager loops receiving messages until first ControllerEvent message occurs.
 
@@ -28,7 +28,7 @@ When MessageManager is in Controllers state. The message is handled by **Control
 
 #### ConfigurationMessage
 
-<img src="\Images\Assembly.png" style="zoom:67%;" />
+<img src="Images\Assembly.png" style="zoom:67%;" />
 
 It serves to create new table of ControllerEvent class in ControllersEventManager.
 
