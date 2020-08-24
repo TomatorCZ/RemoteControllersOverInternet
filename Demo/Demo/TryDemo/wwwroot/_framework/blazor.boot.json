@@ -6,7 +6,7 @@
   "linkerEnabled": false,
   "resources": {
     "assembly": {
-      "Client.dll": "sha256-gdi9QWmIrtTrvp+JDKcikCtGvBs8CQw5pC4xIb2Oyq8=",
+      "Client.dll": "sha256-0LLDYyeJlUsvboC76cin67td6VyS7n1J9pMnmmTydSw=",
       "Microsoft.Extensions.DependencyInjection.Abstractions.dll": "sha256-tjbh51aVu1kTNULze+ql74GraZd0WcTaq28VNttAPKA=",
       "netstandard.dll": "sha256-\/zcPVM75OAY+joGVM8yIC1gO1SFYWP1CFERgQ8PJkfA=",
       "System.Xml.Linq.dll": "sha256-K6HLnQlQSdE7ldv4wMV9PqfWjOtBoW5nl3R\/XUF9bg4=",
@@ -59,7 +59,7 @@
       "Microsoft.JSInterop.WebAssembly.dll": "sha256-Sljk6nvSPSpTCrJ6+bd12XiNuOwqOHEKHPSBoINTtWo="
     },
     "pdb": {
-      "Client.pdb": "sha256-2odORb8+fBTYLfUWNPJZE4yIUSCf8H2glC4IYAQyJpM=",
+      "Client.pdb": "sha256-ncR8MBCtM5Zw\/P7TLqflNovns4l1fJt+XQ9SBZOeggw=",
       "Components.pdb": "sha256-0eNhtAlikdKEzw5LO\/+yLpQ6a0azTma2U5eIOh4VeeI=",
       "Shared.pdb": "sha256-FaGVuyug\/oXCOvybTRTotlef4kGK84JNOR9TvH45Ms8="
     },

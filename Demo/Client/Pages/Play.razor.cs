@@ -35,7 +35,15 @@ namespace Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            await _user.ConnectAsync(new Uri(@"ws://localhost:5001/ws"));
+            try
+            {
+                await _user.ConnectAsync(new Uri(@"ws://localhost:5001/ws"));
+            }
+            catch (Exception)
+            {
+
+                return;
+            }
             await _user.SendAsync(new InitialMessage());
 
             ConfigurationMessage msg = new ConfigurationMessage();
