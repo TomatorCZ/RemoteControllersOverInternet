@@ -6,13 +6,13 @@ We will use Visual Studio 2019.
 
 ### Guide
 
-I made demo to show you how to use this library. Examples are chose from the demo. See /Demo folder for complete example.
+I made demo to show you how to use this library. Examples are chose from the demo. See /Demo folder for a complete example.
 
 #### Overview
 
-Project contains 3 .dll library : **Server.dll**, **Shared.dll**, **Components.dll**. **Server.dll** provides server side of application. **Components.dll** provides predefined razor components like ButtonController which represents button. **Shared.dll** is used by Server.dll and Components.dll and contains additional data structures.
+Project contains three .dll libraries : **Server.dll**, **Shared.dll**, **Components.dll**. **Server.dll** provides a server side. **Components.dll** provides predefined razor components like ButtonController which represents button. **Shared.dll** is used by Server.dll and Components.dll and contains additional data structures.
 
- Versions of .dlls.
+#####  Versions of .dlls.
 
 | .dll           | Version                        |
 | -------------- | ------------------------------ |
@@ -22,21 +22,21 @@ Project contains 3 .dll library : **Server.dll**, **Shared.dll**, **Components.d
 
 #### Server side
 
-We will start with server side. 
+We will start with a server side. 
 
-Create new project. Project should have reference to **AspNetCore** framework or you have to add a lot of nugget packages. Copy **Server.dll** and **Shared.dll** into bin folder and add dependencies to them. Now you can use API of them.  
+Create a new project. Project should have a reference to **AspNetCore** framework or you have to add a lot of nugget packages. Copy **Server.dll** and **Shared.dll** into bin folder and add dependencies to them. Now you can use an API of them.  
 
 ![](Images/Project.PNG) 
 
-There can be issues with versions of nuggets, so you just add appropriate version. As you can see in the example, newer Dependency Injection is added.
+There can be issues with versions of nuggets, so you just add an appropriate version. As you can see in the example, newer Dependency Injection is added.
 
 If you want to make own configuration of server you need also **WebAssembly.Server** nugget which provides useful methods to host Blazor app.
 
-You can see also two additional dependencies: **Client.dll** and **Shared.dll** in the example. There are additional user defined controllers in **Client.dll** and useful data structures in **Shared.dll**, so you have to include it to have a option to use it.
+You can see also two additional dependencies: **Client.dll** and **Shared.dll** in the example. There are additional user's defined controllers in **Client.dll** and useful data structures in **Shared.dll**, so you have to include it to have a option to use it.
 
 ![](Images/Main.PNG)
 
-This is main usage of Server. You can make your own **StartUp**(*MyStartUp*) class to configure server and own **Client**(*MyPlayer*) refers to a connection. Or you can just use predefined classes *StartUp* and *Player*. 
+This is a main usage of Server. You can make your own **StartUp**(*MyStartUp*) class to configure server and own **Client**(*MyPlayer*) refers to a connection. Or you can just use predefined classes *StartUp* and *Player*. 
 
 Method *RunAsync* run http server(In this example *Kestrel*). I will talk about client side later in this article.
 
@@ -44,15 +44,15 @@ You can see *manager* which represents a data structure cares about handling cli
 
 ![](Images/Message.PNG)      
 
-Classes, which inherits *ControllerEvent*, can be sent to client or can be received from client. Classes, which inherits *ControllerEvent*, have to define new *TryDecode* method. 
+Classes, which inherits *ControllerEvent*, can be sent to client or can be received from client. Classes, which inherits *ControllerEvent*, have to define a new *TryDecode* method. 
 
 ![](Images/HandlMessage.PNG) 
 
-There are other types of messages. Configuration message is a special message to get to know receiving point about how to decode incoming message. You just connect some id with Type class, which represent class of ControllerEvent or their children, and send it. From now, client can read this type of message with this ID. You can not send other type of message with the ID. But you can change it by another configuration message.
+There are other types of messages. Configuration message is a special message to get to know receiving point about how to decode incoming message. You just connect some id with Type class, which represent class of ControllerEvent or their children, and send it. From now, client can read this type of message with this ID. You can not send an other type of message with the ID. But you can change it by another configuration message.
 
 #### Client side
 
-You will start with Blazor web assembly project. In other to server can send **WASM** to client browser, you have to copy bin folder to Server side app with all static files (*wwwroot*).
+We will start with Blazor web assembly project. In other to server can send **WASM** to client browser, you have to copy bin folder to Server side app with all static files (*wwwroot*).
 
 ![](Images/Files.PNG)
 
