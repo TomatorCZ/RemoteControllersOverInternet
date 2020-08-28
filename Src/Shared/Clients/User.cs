@@ -16,7 +16,7 @@ namespace RemoteController
         }
 
         /// <summary>
-        /// Connects and sends initial message.
+        /// Connects and sends <see cref="InitialMessage">.
         /// </summary>
         public async Task ConnectAsync(Uri uri)
         {

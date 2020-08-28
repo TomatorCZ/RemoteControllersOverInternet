@@ -20,7 +20,6 @@ namespace RemoteController
 
         public bool IsDisposed { get; private set; } = false;
         public bool RemoveClientsAfterDisconnect { get; } = true;
-
         public event Action<TClient> OnClientDisconnect;
 
         public ClientManager(IClientFactory<TClient> clientFactory)
@@ -51,7 +50,7 @@ namespace RemoteController
         }
 
         /// <summary>
-        /// Disconnects client.
+        /// Disconnects a client with the id.
         /// </summary>
         public async Task RemoveClient(Guid id)
         {
@@ -65,7 +64,7 @@ namespace RemoteController
         }
 
         /// <summary>
-        /// Gets a client with the index or null, if index is invalid.
+        /// Returns a client with the id or null, if index is invalid.
         /// </summary>
         public TClient GetClient(Guid id)
         {
@@ -80,6 +79,10 @@ namespace RemoteController
         }
         #endregion
 
+        /// <summary>
+        /// Waits until an event is recieved by some client and it is returned with information about this client.
+        /// </summary>
+        /// <returns></returns>
         public async Task<InfoControllerEvent> RecieveEventAsync()
         {
             InfoControllerEvent result = default;
@@ -123,6 +126,9 @@ namespace RemoteController
             return result;
         }
 
+        /// <summary>
+        /// Sends the event to the client. The id of event has to be contained in a configuration message, which is sent to the client.
+        /// </summary>
         public async Task<bool> SendAsync(Guid id, ControllerEvent @event)
         {
             if (Players.TryGetValue(id, out TClient player))
@@ -136,15 +142,25 @@ namespace RemoteController
             }
         }
 
+        /// <summary>
+        /// Disconnects all clients.
+        /// </summary>
         public async Task CloseAsync()
         {
             foreach (var client in Players)
+            {
                 await client.Value.CloseAsync();
+                client.Value.Dispose();
+            }
+                
             
             lock(_playersLock)
                 Players = new Dictionary<Guid, TClient>();
         }
 
+        /// <summary>
+        /// Releases all resources.
+        /// </summary>
         public void Dispose()
         {
             foreach (var client in Players)

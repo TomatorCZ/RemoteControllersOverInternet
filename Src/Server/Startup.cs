@@ -6,6 +6,10 @@ using Microsoft.Extensions.Hosting;
 
 namespace RemoteController
 {
+
+    /// <summary>
+    /// Default configuration of server.
+    /// </summary>
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -15,12 +19,19 @@ namespace RemoteController
 
         public IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Adds a <see cref="ClientManager{TClient}> to services.
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             //Add client Manager to handle clients
             services.AddClientManager<Player>(new PlayerFactory());
         }
 
+        /// <summary>
+        /// Adds web socket's middleware and BlazorFramework middleware with other necessary midleware into the pipeline. 
+        /// </summary>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

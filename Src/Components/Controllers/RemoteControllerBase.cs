@@ -5,6 +5,9 @@ using System.Text;
 
 namespace RemoteController
 {
+    /// <summary>
+    /// Base class for all controllers.
+    /// </summary>
     public class RemoteControllerBase : ComponentBase
     {
         [Parameter]

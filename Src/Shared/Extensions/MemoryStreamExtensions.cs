@@ -8,6 +8,9 @@ namespace RemoteController
 {
     public static class MemoryStreamExtensions
     {
+        /// <summary>
+        /// Writes the whole array to the stream.
+        /// </summary>
         public static void WriteBytes(this MemoryStream stream, byte[] value)
         {
             if (value == null)

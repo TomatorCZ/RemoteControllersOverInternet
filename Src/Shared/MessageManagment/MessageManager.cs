@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace RemoteController
 {
     /// <summary>
-    /// Represents a state of connection.
+    /// Represents a current state of <see cref="MessageManager"/>. e.g. When the manager is in Configuration state, it accepts only configuration messages. 
     /// </summary>
     public enum MessageManagerState
     {
@@ -17,6 +17,9 @@ namespace RemoteController
         Controllers = 3
     }
 
+    /// <summary>
+    /// The manager provides encoding, decoding, configuring messages which are sent and received by client or server.
+    /// </summary>
     public class MessageManager : IDisposable
     {
         protected Encoding _encoding;
@@ -27,8 +30,16 @@ namespace RemoteController
         protected bool IsEventChannel = false;
 
         public bool IsDisposed { get; private set; } = false;
+        
+        /// <summary>
+        /// It is called when a close message is received.
+        /// </summary>
         public event Action OnCloseMessage;
 
+        /// <summary>
+        /// The constructor.
+        /// </summary>
+        /// <param name="encoding">Encoding is used for encoding and decoding messages.</param>
         public MessageManager(Encoding encoding)
         {
             _encoding = encoding;
@@ -38,6 +49,10 @@ namespace RemoteController
         }
 
         #region Send
+
+        /// <summary>
+        /// Sends an initial message at beginning of communication.
+        /// </summary>
         public async Task<bool> SendGreetingsAsync(WebSocket socket)
         {
             try
@@ -52,6 +67,9 @@ namespace RemoteController
             return true;
         }
 
+        /// <summary>
+        /// Sends a configuration message which sets binding between ids and types of event.
+        /// </summary>
         public async Task<bool> SendConfigurationAsync(WebSocket socket, ConfigurationMessage msg)
         {
             try
@@ -67,6 +85,9 @@ namespace RemoteController
             return true;
         }
 
+        /// <summary>
+        /// Sends an event to other endpoint. Id of event has to be noticed in <see cref="ConfigurationMessage">.
+        /// </summary>
         public async Task<bool> SendAsync(WebSocket socket, ControllerEvent eventArgs)
         {
             try
@@ -107,6 +128,9 @@ namespace RemoteController
             }
         }
 
+        /// <summary>
+        /// Recieves messages and handles them until the first event is recieved. The event is decoded and returned.
+        /// </summary>
         public virtual async Task<ControllerEvent> ReceiveAsync(WebSocket socket)
         {
             byte[] message = await ReceiveRawDataAsync(socket);
@@ -190,11 +214,18 @@ namespace RemoteController
             }
         }
 
+        /// <summary>
+        /// Calls cancel on all running tasks.
+        /// </summary>
         public virtual void Close()
         {
             _src?.Cancel();
+            _src = new CancellationTokenSource();
         }
 
+        /// <summary>
+        /// Cancels running tasks and disposes a token source.
+        /// </summary>
         public virtual void Dispose()
         {
             _src?.Cancel();

@@ -6,6 +6,9 @@ using System.Text;
 
 namespace RemoteController
 {
+    /// <summary>
+    /// Represents type of recieved message.
+    /// </summary>
     public enum MessageType 
     {
         ConfigurationMessage = 1, 
@@ -19,7 +22,7 @@ namespace RemoteController
     }
 
     /// <summary>
-    /// Message requests change of state of server listenner. When configuration is enable, a server listens in a verbose mode, else a server listens only <see cref="ControllerEvent"/>.
+    /// The message requests change of state of server listenner. When configuration is enable, a server listens in a verbose mode, else a server listens only <see cref="ControllerEvent"/>.
     /// </summary>
     public class ChangeStateMessage : IEncoder
     {
@@ -77,6 +80,9 @@ namespace RemoteController
         #endregion
     }
 
+    /// <summary>
+    /// An initial message of connection.
+    /// </summary>
     public class InitialMessage : IEncoder
     {
         public byte[] Encode(Encoding encoding)
@@ -93,7 +99,7 @@ namespace RemoteController
     }
 
     /// <summary>
-    /// Provides information about user configuration of controllers.
+    /// Provides information about user's configuration of controllers. It decodes names of classes with ids. 
     /// </summary>
     public class ConfigurationMessage:IEncoder
     {
@@ -112,6 +118,9 @@ namespace RemoteController
         /// </summary>
         public void AddBinding(byte ID, ControllerEvent args) => AddBinding(ID, args.GetType());
 
+        /// <summary>
+        /// Checks if ID isn't already used and appends it to the message. The type class should define TryDecode method.
+        /// </summary>
         public void AddBinding(byte ID, Type args)
         {
             if (Args.ContainsKey(ID))
@@ -136,7 +145,7 @@ namespace RemoteController
         #region Encode/Decode
 
         /// <summary>
-        /// Encodes this into pattern |(byte)MessageType.Configuration|0|(byte)ID|(byte)FullName of controller event class.
+        /// Encodes this into a pattern |(byte)MessageType.Configuration|0|(byte)ID|(byte)FullName of controller event class.
         /// </summary>
         public byte[] Encode(Encoding encoding)
         {
@@ -160,7 +169,7 @@ namespace RemoteController
         }
 
         /// <summary>
-        /// Decodes s message and finds Type instances by their name in the data.
+        /// Decodes the message and finds Type instances by their name in the data.
         /// </summary>
         public static bool TryDecode(byte[] data, Encoding encoding, out ConfigurationMessage msg)
         {

@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace RemoteController
 {
+    /// <summary>
+    /// Represents endpoint of connection.
+    /// </summary>
     public abstract class Client : IDisposable
     {
-        public WebSocket _websocket;
+        protected WebSocket _websocket;
         protected MessageManager _messageManager;
         protected CancellationTokenSource _src;
 
@@ -21,12 +24,19 @@ namespace RemoteController
         }
 
         #region Send/Recieve
+
+        /// <summary>
+        /// Sends an event. Event and it's id have to be contained in a configuration message, which is sent to server/client.
+        /// </summary>
         public async Task<bool> SendAsync(ControllerEvent eventArgs) => await _messageManager.SendAsync(_websocket, eventArgs);
 
+        /// <summary>
+        /// Sends a initial message.
+        /// </summary>
         public async Task<bool> SendAsync(InitialMessage msg) => await _messageManager.SendGreetingsAsync(_websocket);
 
         /// <summary>
-        /// Sends configuration message.
+        /// Sends a configuration message.
         /// </summary>
         public async Task<bool> SendAsync(ConfigurationMessage msg)
         {
@@ -37,18 +47,24 @@ namespace RemoteController
         } 
         #endregion
 
+        /// <summary>
+        /// Closes the web socket and <see cref="MessageManager"> with all running tasks.
+        /// </summary>
         public async Task CloseAsync()
         {
-            if (_src == null)
-                _src = new CancellationTokenSource();
-            else
-                _src?.Cancel();
+            _src?.Cancel();
+
+            _src = new CancellationTokenSource();
 
             if (_websocket.State == WebSocketState.Open)
                 await _websocket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, _src.Token);
-            _messageManager.Dispose();
+            
+            _messageManager.Close();
         }
 
+        /// <summary>
+        /// Disposes all resources.
+        /// </summary>
         public virtual void Dispose()
         {
             _src?.Cancel();

@@ -2,6 +2,9 @@
 
 namespace RemoteController
 {
+    /// <summary>
+    /// Represents information about which controller raised the event.
+    /// </summary>
     public struct ControllerEventInfo
     {
         public ControllerEventInfo(byte iD, ControllerEvent controllerEvent)
@@ -10,10 +13,16 @@ namespace RemoteController
             ControllerEvent = controllerEvent;
         }
 
+        /// <summary>
+        /// ID of controller.
+        /// </summary>
         public byte ID { get; }
         public ControllerEvent ControllerEvent { get; }  
     }
 
+    /// <summary>
+    /// Base class for events. Each event has to define a new TryDecode method which decodes an encoded message.
+    /// </summary>
     public class ControllerEvent : IEncoder
     {
         public byte SenderID { get; }
@@ -47,6 +56,10 @@ namespace RemoteController
     
     #region Button
     public enum ButtonEvent { Click, MouseDown, MouseUp }
+
+    /// <summary>
+    /// Represents event which is raised by a button.
+    /// </summary>
     public class ButtonControllerEvent : ControllerEvent
     {
         public ButtonEvent Event { get; }

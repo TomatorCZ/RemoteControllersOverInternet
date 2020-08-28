@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace RemoteController
 {
+    /// <summary>
+    /// Represents a button.
+    /// </summary>
     public partial class ButtonController : RemoteControllerBase
     {
         [Parameter]

@@ -67,6 +67,9 @@ namespace RemoteController
             await _host.StopAsync();
         }
 
+        /// <summary>
+        /// Releases all resources.
+        /// </summary>
         public void Dispose()
         {
             Manager.Dispose();

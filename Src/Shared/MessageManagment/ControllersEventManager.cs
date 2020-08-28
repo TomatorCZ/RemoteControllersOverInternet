@@ -6,17 +6,29 @@ using System.Text;
 
 namespace RemoteController
 {
+
+    /// <summary>
+    /// Takes care about handling and encoding, decoding events.
+    /// </summary>
     public class ControllersEventManager
     {
         Encoding _encoding;
         public Dictionary<byte, Type> Args { get; }
 
+        /// <summary>
+        /// The constructor. Binding between ids and events are obtained from <see cref="ConfigurationMessage"/>.
+        /// </summary>
         public ControllersEventManager(ConfigurationMessage msg, Encoding encoding)
         {
             Args = msg.Args;
             _encoding = encoding;
         }
 
+        /// <summary>
+        /// Decodes bytes to an event due to id and type class which is obtained from <see cref="ConfigurationMessage">.
+        /// </summary>
+        /// <param name="id">The first byte of received message.</param>
+        /// <param name="data">The data.</param>
         public ControllerEvent GetEvent(byte id, byte[] data)
         {
             if (!Args.ContainsKey(id))

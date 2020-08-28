@@ -13,7 +13,14 @@ namespace RemoteController
             Event = @event;
         }
 
+        /// <summary>
+        /// Sender of the event.
+        /// </summary>
         public Guid Sender { get; }
+
+        /// <summary>
+        /// The event.
+        /// </summary>
         public ControllerEvent Event { get; }
     }
 }

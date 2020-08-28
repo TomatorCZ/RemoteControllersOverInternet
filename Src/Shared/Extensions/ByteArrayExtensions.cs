@@ -42,7 +42,7 @@ namespace RemoteController
         }
 
         /// <summary>
-        /// Creates new array and copies all bytes in given range.
+        /// Creates a new array and copies all bytes in given range.
         /// </summary>
         public static byte[] SubArray(this byte[] array, int index, int length)
         {
