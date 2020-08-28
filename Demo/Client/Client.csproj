@@ -16,10 +16,10 @@
 
   <ItemGroup>
     <Reference Include="Components">
-      <HintPath>bin\Debug\netstandard2.1\Components.dll</HintPath>
+      <HintPath>..\Demo\TryDemo\Components.dll</HintPath>
     </Reference>
     <Reference Include="Shared">
-      <HintPath>bin\Debug\netstandard2.1\Shared.dll</HintPath>
+      <HintPath>..\Demo\TryDemo\Shared.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
